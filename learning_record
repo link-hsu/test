@@ -1,0 +1,24 @@
+1.	安裝SQL EXPRESS、SSMS
+2.	新增連線 本地IP或 (local)
+3.	設定 WINDOWS工具(IIS連線等也都在這邊) -> 電腦管理
+-> 服務與應用程式 -> SQL組態管理員 -> 開啟TCP連線
+4. SSMS可以設定項目有
+	點「連線」-> 資料庫引擎
+	SQL SERVER右鍵 「屬性」
+	安全性->登入 右鍵 新增登入
+	安全性->登入->成員 右鍵 屬性
+
+Note: 另外工作管理員是管理程序(thread)
+
+https://learn.microsoft.com/zh-tw/sql/relational-databases/backup-restore/create-a-full-database-backup-sql-server?view=sql-server-ver16
+
+https://chatgpt.com/share/67511336-b05c-8010-bf31-8f8a5ec7b8ab
+
+1.	工作 -> 產生指令碼
+適用於小型資料庫，只產生SQL語法
+2.	工作 -> 匯出資料層應用
+.bacpac 格式適合輕量級的搬移，包括結構和數據，但不包括使用者和登錄信息。
+3.	工作 -> 匯出資料
+適合部分表或數據的搬移，而非整個資料庫。
+4.	工作 -> 備份
+最完整和快速的搬移方法，適合中大型資料庫。
