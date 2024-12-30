@@ -1,0 +1,41 @@
+@{
+    ViewBag.Title = "舊戶加開信用.款項借貸.不限用途款項借貸 線上開戶";
+    ViewBag.PageDescription = "舊戶加開信用.款項借貸.不限用途款項借貸線上開戶";
+    ViewBag.PageKeywords = "舊戶加開信用,款項借貸,不限用途款項借貸";
+    ViewBag.MasterPagePanelHeadTitle = "線上開戶";
+}
+
+@Html.AntiForgeryToken()
+
+@{ Html.RenderPartial(@"_DcnSsoStockPartial"); }
+
+@section Scripts {
+    <script>
+    $(document).ready(function () {
+      Dcn.Utility.CheckBorwser();
+    });
+    </script>
+
+    <!-- Meta Pixel Code -->
+    @*<script>
+    !function (f, b, e, v, n, t, s) {
+      if (f.fbq) return; n = f.fbq = function () {
+        n.callMethod ?
+        n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+      };
+      if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+      n.queue = []; t = b.createElement(e); t.async = !0;
+      t.src = v; s = b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t, s)
+    }(window, document, 'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1904340723284181');
+    fbq('track', 'PageView');
+    </script>*@
+    <noscript>
+        <img height="1" width="1" style="display:none"
+             src="https://www.facebook.com/tr?id=1904340723284181&ev=PageView&noscript=1" />
+    </noscript>
+    <!-- End Meta Pixel Code -->
+
+}
