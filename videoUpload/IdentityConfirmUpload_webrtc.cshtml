@@ -1,0 +1,330 @@
+@using Dcn.SqlClient.ViewModels.Front
+@model StockOpenIdentityConfirmUploadViewModels
+@{
+    ViewBag.Title = "證券開戶「確認身分」 - 線上開戶";
+    ViewBag.PageDescription = "證券 開戶「確認身分」，";
+    ViewBag.PageKeywords = "證券開戶, 確認身分,";
+    ViewBag.MasterPagePanelHeadTitle = "線上開戶";
+}
+
+@using (Html.BeginForm("IdentityConfirmUpload", "StockOpen", FormMethod.Post, new { @id = "MyForm", @AutoComplete = "Off", @role = "form" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="col-md-12 text-center">
+                <h2>第二步：上傳手持身分證自拍照，作為確認身分使用</h2>
+                <hr class="form-control-hr-title">
+            </div>
+        </div>
+        @{Html.RenderPartial("_MenuPartial");}
+        <div class="form-group">
+            <div class="col-md-12 col-sm-12 col-xs-12 text-center">
+                <mark>
+                    【請上傳畫質清晰的圖片】
+                </mark>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12 col-sm-12 col-xs-12 text-center">
+                <mark>
+                    【上傳圖片副檔名僅限於：.JPG .JPEG .BMP .GIF .PNG, 上傳圖片請勿大於 5MB】
+                </mark>
+            </div>
+        </div>
+        @{ Html.RenderPartial("_FrontValidationSummaryPartial"); }
+
+        <fieldset>
+            <legend class="text-center">檔案上傳</legend>
+            <hr>
+            <div class="form-group">
+                <div class="col-md-12 col-sm-12 col-xs-12 text-center">
+                    <video id="localVideo" autoplay muted playsinline style="width: 100%; height: auto; max-width: 640px; max-height: 480px; border: 1px solid #000;"></video>
+                    <video id="remoteVideo" autoplay muted playsinline style="width: 100%; height: auto; max-width: 640px; max-height: 480px; border: 1px solid #000;"></video>
+                    小螢幕
+                </div>
+                <div class="col-md-offset-4 col-md-4 col-sm-offset-3 col-sm-6 col-xs-offset-1 col-xs-5">
+                    <input type="button" value="開始視訊驗證" name="TempSave" id="StartClick" class="btn btn-info btn-block" />
+                    <input type="button" value="結束視訊驗證" name="TempSave" id="EndClick" class="btn btn-info btn-block" />
+                </div>
+            </div>
+            <hr class="form-control-hr-space">
+        </fieldset>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-4 col-sm-offset-2 col-sm-4 col-xs-6">
+                @Html.ActionLink("上一步", "Contract", null, new { @class = "btn btn-danger btn-block", @title = "上一步" })
+            </div>
+            <div class="col-md-4 col-sm-4 col-xs-6">
+                <input type="submit" title="下一步" value="下一步" name="NextSave" id="NextSave" class="btn btn-danger btn-block" />
+            </div>
+        </div>
+        @{Html.RenderPartial("FormMessage/_TempSaveButtonPartial");}
+    </div>
+}
+
+@section Scripts {
+
+    @Scripts.Render("~/Scripts/jqueryval")
+    @Scripts.Render("~/Scripts/jQuery.FileUpload")
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#MyForm").submit(function (event) {
+                Dcn.Message.FormSubmit();
+            });
+        });
+
+        Dcn.Utility.SetInputMaxLength();
+        var post_url = '@Url.Action("UploadIdentityConfirm")';
+        Dcn.Ajax.jquery_upload_file_image(post_url, "#IdentityConfirm");
+        $('#IdentityConfirm').bind('fileuploaddone', Dcn.ImageTool.set_fileuploaddone_data_to_url);
+
+    </script>
+
+    <script type="text/javascript">
+        $(function() {
+            $("#IdentityConfirm").rules('add', {
+                identityvalidation: {
+                    id :"#IdentityConfirm_image"
+                }
+                ,messages:{
+                    identityvalidation: "請上傳：手持身分證自拍照(必填)"
+                }
+            });
+        });
+
+        @if (Model != null)
+        {
+            if(Model.IdentityConfirm)
+            {
+                @:$("#IdentityConfirm_State").append("(已上傳)")
+            }
+        }
+    </script>
+
+
+    @Scripts.Render("~/Scripts/SignalR")
+    <script src="~/signalr/hubs"></script>
+    <script type="text/javascript">
+        // 185 186 設置遠端雙方連線
+        // 裝置是否為行動裝置
+        function isMobile() {
+            return /Android|webOS|iPhone|iPad|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        const videoRecord = document.getElementById("videoRecord");
+        const StartClick = document.getElementById("StartClick");
+        const EndClick = document.getElementById("EndClick");
+
+        // 視訊錄製 use mediaDevices
+        async function jquery_upload_file_video(video_record, start_click, end_click) {
+            let mediaRecorder;
+            let recordChunks = [];
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" }, audio: true, });
+                video_record.srcObject = stream;
+
+                start_click.addEventListener('click', () => {
+                    recordChunks = [];
+                    const options = MediaRecorder.isTypeSupported("video/mp4;codecs=avc1")
+                        ? { mimeType: "video/mp4;codecs=avc1" }
+                        : { mimeType: "video/webm;codecs=vp8" };
+                    mediaRecorder = new MediaRecorder(stream, options);
+
+                    mediaRecorder.ondataavailable = (event) => {
+                        if (event.data.size > 0) {
+                            recordChunks.push(event.data);
+                        }
+                    };
+                    mediaRecorder.onstop = async () => {
+                        const blob = new Blob(recordChunks, { type: options.mimeType });
+                        const formData = new FormData();
+                        formData.append("videoFile", blob, "recording." + (options.mimeType.includes("mp4") ? "mp4" : "webm"));
+
+                        const controller = new AbortController();
+                        setTimeout(() => controller.abort(), 30000); // 30秒超時
+
+                        try {
+                            const response = await fetch("upload", {
+                                method: "POST",
+                                body: formData,
+                                signal: controller.signal,
+                            });
+                            if (response.ok) {
+                                alert("錄製完成並成功上傳！");
+                            } else {
+                                alert("上傳失敗！");
+                            }
+                        } catch (error) {
+                            alert("上傳失敗，請檢查網路或稍後重試！");
+                        }
+                    };
+                    mediaRecorder.start();
+
+                    start_click.disabled = true;
+                    end_click.disabled = false;
+                });
+
+                end_click.addEventListener('click', () => {
+                    mediaRecorder.stop();
+                    start_click.disabled = false;
+                    end_click.disabled = true;
+                });
+
+            } catch (err) {
+                console.log("Error: " + err);
+                alert("無法啟動攝像頭，請檢查設備設置！");
+            }
+        }
+
+        jquery_upload_file_video(videoRecord, StartClick, EndClick);
+
+        // WebRTC 雙邊即時視訊
+
+        async function jquery_upload_webrtc_video(video_record, start_click, end_click) {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            const peerConnection = new RTCPeerConnection();
+
+            // 將stream加入 WebRTC傳輸
+            stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
+
+            // 將WebRTC視訊加入video元素
+            video_record.srcObject = stream;
+
+            start_click.addEventListener('click', () => {
+                // 使用MediaRecorder錄製WebRTC視訊
+                const mediaRecorder = new MediaRecorder(stream);
+
+                const recordChunks = [];
+                try {
+                    mediaRecorder.ondataavailable = (event) => {
+                        if (event.data.size > 0) {
+                            recordChunks.push(event.data);
+                        }
+                    };
+                    mediaRecorder.onstop = () => {
+                        const blob = new Blob(recordChunks, { type: "video/webm" });
+                        const formData = new FormData();
+                        formData.append("videoFile", blob, "recording.webm");
+
+                        const controller = new AbortController();
+                        setTimeout(() => controller.abort(), 30000); // 30秒超時
+
+                        fetch("upload", {
+                            method: "POST",
+                            body: formData,
+                            signal: controller.signal,
+                        }).then(response => {
+                            if (response.ok) {
+                                alert("錄製完成並成功上傳！");
+                            } else {
+                                alert("上傳失敗！");
+                            }
+                        }).catch(error => {
+                            alert("上傳失敗，請檢查網路或稍後重試！");
+                        });
+                    };
+                    mediaRecorder.start();
+
+                    start_click.disabled = true;
+                    end_click.disabled = false;
+                } catch (err) {
+                    console.log("Error" + err);
+                    alert("無法啟動攝像頭，請檢查設備設置！");
+                }
+
+            });
+
+            end_click.addEventListener('click', () => {
+                mediaRecorder.stop();
+                start_click.disabled = false;
+                end_click.disabled = true;
+            })
+        }
+
+        jquery_upload_webrtc_video();
+
+        // WebRTC 雙邊即時視訊
+        const localVideo = document.getElementById("localVideo");
+        const remoteVideo = document.getElementById("remoteVideo");
+        const startClick = document.getElementById("StartClick");
+        const endClick = document.getElementById("EndClick");
+
+        let localStream;
+        let remoteStream;
+        let peerConnection;
+        const configuration = {
+            iceServers: [
+                { urls: "stun:stun.l.google.com:19302" },
+            ],
+        };
+
+        const signalRConnection = new signalR.HubConnectionBuilder().withUrl("/signalr").build();
+        signalRConnection.on("ReceiveSignal", (signal) => {
+            if (signal.sdp) {
+                peerConnection.setRemoteDescription(new RTCSessionDescription(signal.sdp)).then(() => {
+                    if (peerConnection.remoteDescription.type === 'offer') {
+                        peerConnection.createAnswer().then(answer => {
+                            return peerConnection.setLocalDescription(answer);
+                        }).then(() => {
+                            signalRConnection.invoke("SendSignal", { sdp: peerConnection.localDescription });
+                        });
+                    }
+
+                });
+            } else if (signal.ice) {
+                peerConnection.addIceCandidate(new RTCIceCandidate(signal.ice));
+            }
+        });
+
+        startClick.addEventListener('click', () => {
+            navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
+                localStream = stream;
+                localVideo.srcObject = stream;
+
+                peerConnection = new RTCPeerConnection(configuration);
+
+                peerConnection.addStream(localStream);
+
+                peerConnection.onaddstream = (event) => {
+                    remoteStream = event.stream;
+                    remoteVideo.srcObject = remoteStream;
+                };
+
+                peerConnection.onicecandidate = (event) => {
+                    if (event.candidate) {
+                        signalRConnection.invoke("SendSignal", { ice: event.candidate });
+                    }
+                };
+
+                peerConnection.createOffer().then(offer => {
+                    return peerConnection.setLocalDescription(offer);
+                }).then(() => {
+                    signalRConnection.invoke("SendSignal", { sdp: peerConnection.localDescription });
+                });
+            });
+        });
+
+        endClick.addEventListener('click', () => {
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+            if (peerConnection) {
+                peerConnection.close();
+            }
+        });
+
+        signalRConnection.start().catch(err => console.error(err.toString()));
+    </script>
+
+    @if (TempData["message"] != null)
+    {
+        <script type="text/javascript">
+            var message = @Html.Raw(TempData["message"]);
+            Dcn.Message.array("訊息",　message);
+        </script>
+    }
+}
+
+
