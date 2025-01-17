@@ -1,0 +1,258 @@
+@using Dcn.SqlClient.ViewModels.Front
+@model StockOpenIdentityConfirmUploadViewModels
+@{
+    ViewBag.Title = "證券開戶「確認身分」 - 線上開戶";
+    ViewBag.PageDescription = "證券 開戶「確認身分」，";
+    ViewBag.PageKeywords = "證券開戶, 確認身分,";
+    ViewBag.MasterPagePanelHeadTitle = "線上開戶";
+}
+
+@using (Html.BeginForm("IdentityConfirmUpload", "StockOpen", FormMethod.Post, new { @id = "MyForm", @AutoComplete = "Off", @role = "form" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="col-md-12 text-center">
+                <h2>第二步：上傳手持身分證自拍照，作為確認身分使用</h2>
+                <hr class="form-control-hr-title">
+            </div>
+        </div>
+        @{Html.RenderPartial("_MenuPartial");}
+        <div class="form-group">
+            <div class="col-md-12 col-sm-12 col-xs-12 text-center">
+                <mark>
+                    【請上傳畫質清晰的圖片】
+                </mark>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12 col-sm-12 col-xs-12 text-center">
+                <mark>
+                    【上傳圖片副檔名僅限於：.JPG .JPEG .BMP .GIF .PNG, 上傳圖片請勿大於 5MB】
+                </mark>
+            </div>
+        </div>
+        @{ Html.RenderPartial("_FrontValidationSummaryPartial"); }
+
+        <fieldset>
+            <legend class="text-center">檔案上傳</legend>
+            <hr>
+            <div class="form-group">
+                <div class="col-md-12 col-sm-12 col-xs-12 text-center">
+                    <video id="videoClient" autoplay playsinline style="width: 100%; height: auto; max-width: 640px; max-height: 480px; border: 1px solid #000;"></video>
+                    <video id="videoBackend" autoplay playsinline style="width: 100%; height: auto; max-width: 640px; max-height: 480px; border: 1px solid #000;"></video>
+                </div>
+                <div class="col-md-offset-4 col-md-4 col-sm-offset-3 col-sm-6 col-xs-offset-1 col-xs-5">
+                    <input type="submit" value="開始視訊驗證" name="TempSave" id="StartClick" class="btn btn-info btn-block" />
+                    <input type="submit" value="結束視訊驗證" name="TempSave" id="EndClick" class="btn btn-info btn-block" />
+                </div>
+            </div>
+
+            @*<div class="form-group">
+                    <label title="確認身分(請手持身分證)" class="col-md-3 col-sm-3 col-xs-12 control-label" for="IdentityConfirm">
+                        確認身分(請手持身分證)
+                    </label>
+                    <div class="col-md-5 col-sm-5 col-xs-12">
+                        <input type="file" id="IdentityConfirm" name="IdentityConfirm" title="請選擇檔案(確認身分-請手持身分證自拍)" class="btn btn-default btn-block" accept="image/gif, image/png, image/jpg, image/bmp, image/jpeg" data-val="true" />
+                        <div id="IdentityConfirm_State" class="badge"></div>
+                        <div>
+                            @Html.ValidationMessageFor(model => model.IdentityConfirm, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-2 col-xs-12">
+                        @Html.Link("(檢視圖檔)", "#IdentityConfirmIamge", new { @title = "(檢視圖檔)", @class = "btn btn-primary btn-block" })
+                    </div>
+                    <div class="col-md-2 col-sm-2 col-xs-12">
+                        @Html.Link("(範例)", "#IdentityConfirmSample", new { @title = "(範例圖檔)", @class = "btn btn-info btn-block" })
+                    </div>
+                </div>*@
+            <hr class="form-control-hr-space">
+        </fieldset>
+
+        @*<div class="form-group">
+                <div class="col-md-12 col-md-12 col-xs-12">
+                    <table id="IdentityConfirmSample" class="table table-striped table-bordered table-rwd text-center" summary="該表格為「身分確認」區塊，請提供照片需清楚，審查案件時，將會做身分重要依據證明！">
+                        <caption class="text-center text-white btn-primary h4">確認身分(手持身分證)範例</caption>
+                        <thead>
+                            <tr class="td-only-hide th-text-center ">
+                                <th id="h1" class="bg-warning text-bold">
+                                    正面
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td headers="h1" class="text-center">
+                                    <img id="IdentityConfirmSample_image" alt="(範例)身分確認-客戶手持身分證自拍" title="身分確認-客戶手持身分證自拍範本" src="~/Content/Image/Open/Sop/FutureOpen/Open-Future-SampleIdentity.jpg" class="img-responsive img-thumbnail" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>*@
+
+        <!--身分確認 Start-->
+        @*<div class="form-group">
+                <div class="col-md-12 col-md-12 col-xs-12">
+                    <table id="IdentityConfirmIamge" class="table table-striped table-bordered table-rwd text-center img-upload-w-300" summary="該表格為「健保卡-上傳證件」區塊，請依照必要項目上傳圖檔，資料送出時會再判斷是否資料欠缺！">
+                        <caption class="text-center text-white btn-primary h4">確認身分(手持身分證)自拍</caption>
+                        <thead>
+                            <tr class="td-only-hide th-text-center ">
+                                <th id="h6" class="bg-warning text-bold">
+                                    正面
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td headers="h6">
+                                    @if (Model != null)
+                                    {
+                                        if (!String.IsNullOrEmpty(Model.IdentityConfirm_Url))
+                                        {
+                                            <img id="IdentityConfirm_image" alt="(已上傳)身分確認-客戶手持身分證自拍" title="(已上傳)身分確認-客戶手持身分證自拍" onload="this.onload=null;Dcn.Ajax.jquery_get_file_image('@Url.Action("GetImg")', '@Url.Content(Model.IdentityConfirm_Url)', 'IdentityConfirm_image')" src="~/Content/Image/Open/Sop/FutureOpen/Open-Future-SampleIdentity.jpg" class="img-responsive img-thumbnail" />
+                                        }
+                                        else
+                                        {
+                                            <img id="IdentityConfirm_image" alt="身分確認-客戶手持身分證自拍" title="身分確認-客戶手持身分證自拍" src="~/Content/Image/Open/Sop/FutureOpen/Open-Future-SampleIdentity.jpg" class="img-responsive img-thumbnail" />
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <img id="IdentityConfirm_image" alt="身分確認-客戶手持身分證自拍" title="身分確認-客戶手持身分證自拍" src="~/Content/Image/Open/Sop/FutureOpen/Open-Future-SampleIdentity.jpg" class="img-responsive img-thumbnail" />
+                                    }
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>*@
+        <!--身分確認 End-->
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-4 col-sm-offset-2 col-sm-4 col-xs-6">
+                @Html.ActionLink("上一步", "Contract", null, new { @class = "btn btn-danger btn-block", @title = "上一步" })
+            </div>
+            <div class="col-md-4 col-sm-4 col-xs-6">
+                <input type="submit" title="下一步" value="下一步" name="NextSave" id="NextSave" class="btn btn-danger btn-block" />
+            </div>
+        </div>
+        @{Html.RenderPartial("FormMessage/_TempSaveButtonPartial");}
+    </div>
+}
+
+@section Scripts {
+
+    @Scripts.Render("~/Scripts/jqueryval")
+    @Scripts.Render("~/Scripts/jQuery.FileUpload")
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#MyForm").submit(function (event) {
+                Dcn.Message.FormSubmit();
+            });
+        });
+
+        Dcn.Utility.SetInputMaxLength();
+        var post_url = '@Url.Action("UploadIdentityConfirm")';
+        Dcn.Ajax.jquery_upload_file_image(post_url, "#IdentityConfirm");
+        $('#IdentityConfirm').bind('fileuploaddone', Dcn.ImageTool.set_fileuploaddone_data_to_url);
+
+    </script>
+
+    <script type="text/javascript">
+        $(function() {
+            $("#IdentityConfirm").rules('add', {
+                identityvalidation: {
+                    id :"#IdentityConfirm_image"
+                }
+                ,messages:{
+                    identityvalidation: "請上傳：手持身分證自拍照(必填)"
+                }
+            });
+        });
+
+        @if (Model != null)
+        {
+            if(Model.IdentityConfirm)
+            {
+                @:$("#IdentityConfirm_State").append("(已上傳)")
+            }
+        }
+    </script>
+
+
+    @Scripts.Render("~/Scripts/SignalR")
+    <script src="~/signalr/hubs"></script>
+    <script type="text/javascript">
+
+
+        // 185 186 設置遠端雙方連線
+        // 裝置是否為行動裝置
+        function isMobile() {
+            return /Android|webOS|iPhone|iPad|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        // start here
+        const videoClient = document.getElementById("videoClient");
+        const videoBackend = document.getElementById("videoBackend");
+        const startButton = document.getElementById("start");
+        const stopButton = document.getElementById("stop");
+        let clientStream;
+
+        // 啟動客戶端視訊
+        startButton.onclick = async () => {
+            clientStream = await navigator.mediaDevices.getUserMedia({ video: true });
+            videoClient.srcObject = clientStream;
+
+            // 設定定時捕獲每一幀並轉換為 Base64
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = videoClient.videoWidth;
+            canvas.height = videoClient.videoHeight;
+
+            setInterval(() => {
+                ctx.drawImage(videoClient, 0, 0, canvas.width, canvas.height);
+                const base64Image = canvas.toDataURL('image/jpeg'); // 轉換為 Base64 編碼的影像
+                // 通知後台，將 Base64 編碼的影像傳送給後台
+                connection.invoke("SendClientVideoFrame", base64Image);
+            }, 100); // 每100毫秒捕獲一次影像
+        };
+
+        // 停止客戶端視訊
+        stopButton.onclick = () => {
+            clientStream.getTracks().forEach(track => track.stop());
+            videoClient.srcObject = null;
+
+            // 通知後台視訊已停止
+            connection.invoke("NotifyVideoStopped");
+        };
+
+        // SignalR 連接
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/videoHub")
+            .build();
+
+        connection.on("ReceiveBackendVideoFrame", (base64Image) => {
+            const img = new Image();
+            img.src = base64Image;
+            img.onload = () => {
+                videoBackend.srcObject = img;
+            };
+        });
+
+        connection.start().catch(err => console.error(err));
+
+
+    </script>
+
+    @if (TempData["message"] != null)
+    {
+        <script type="text/javascript">
+            var message = @Html.Raw(TempData["message"]);
+            Dcn.Message.array("訊息",　message);
+        </script>
+    }
+}
+
+
