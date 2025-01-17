@@ -1,0 +1,130 @@
+using System.Linq;
+using Microsoft.AspNet.SignalR;
+using System.Threading.Tasks;
+using System.IO;
+
+namespace DcnWeb.SignalR
+{
+    public class ChatHub : Hub
+    {
+        private readonly static ConnectionMapping<string> _connections =
+            new ConnectionMapping<string>();
+
+        /// <summary>
+        /// 單一廣播
+        /// </summary>
+        [Authorize(Roles = "Admin,System")]
+        public void Send(string UserId, string message)
+        {
+            Clients.User(UserId).BroadcastMessage(message);
+        }
+
+
+        /// <summary>
+        /// 廣播所有人
+        /// </summary>
+        [Authorize(Roles = "Admin,System")]
+        public void Sends(string message)
+        {
+            Clients.All.BroadcastMessage(message);
+        }
+
+        /// <summary>
+        /// 確認線上人數
+        /// </summary>
+        [Authorize(Roles = "Admin,System")]
+        public void UserOnline()
+        {
+            Clients.All.UserOnline(_connections.Count);
+            Clients.All.WhosOnline(_connections.ToList);
+        }
+
+        public override Task OnConnected()
+        {
+            string name = Context.User.Identity.Name;
+
+            _connections.Add(name, Context.ConnectionId);
+
+            UserOnline();
+
+            return base.OnConnected();
+        }
+
+        /// <summary>
+        /// 斷線時清除
+        /// </summary>
+        public override Task OnDisconnected(bool stopCalled)
+        {
+           _connections.Remove(Context.User.Identity.Name, Context.ConnectionId);
+
+            return base.OnDisconnected(stopCalled);
+        }
+
+        /// <summary>
+        /// 重新連線
+        /// </summary>
+        /// <returns></returns>
+        public override Task OnReconnected()
+        {
+            string name = Context.User.Identity.Name;
+
+            if (!_connections.GetConnections(name).Contains(Context.ConnectionId))
+            {
+                _connections.Add(name, Context.ConnectionId);
+            }
+
+            return base.OnReconnected();
+        }
+    }
+
+    // Hub WebRTC 視訊通話 可能有防火牆問題
+    //public class VideoHub : Hub
+    //{
+    //    // 前台發送視訊 offer 給後台
+    //    public async Task SendOffer(string offer)
+    //    {
+    //        // 發送 offer 給所有其他連接（即後台）
+    //        await Clients.Others.SendAsync("ReceiveOffer", offer);
+    //    }
+
+    //    // 後台發送 answer 給前台
+    //    public async Task SendAnswer(string answer)
+    //    {
+    //        // 發送 answer 給所有其他連接（即前台）
+    //        await Clients.Others.SendAsync("ReceiveAnswer", answer);
+    //    }
+
+    //    // 當審查結束時，通知所有用戶
+    //    public async Task CompleteReview()
+    //    {
+    //        await Clients.All.SendAsync("ReviewCompleted");
+    //    }
+
+    //    // 停止視頻流
+    //    public async Task NotifyVideoStopped()
+    //    {
+    //        await Clients.All.SendAsync("VideoStopped");
+    //    }
+    //}
+
+    public class VideoHub : Hub
+    {
+        // 客戶端將影像資料（Base64 編碼）發送給後台
+        public async Task SendClientVideoFrame(string base64Image)
+        {
+            await Clients.Others.SendAsync("ReceiveClientVideoFrame", base64Image);
+        }
+
+        // 後台將影像資料（Base64 編碼）發送給客戶端
+        public async Task SendBackendVideoFrame(string base64Image)
+        {
+            await Clients.Others.SendAsync("ReceiveBackendVideoFrame", base64Image);
+        }
+
+        // 當審查結束時，通知所有用戶
+        public async Task CompleteReview()
+        {
+            await Clients.All.SendAsync("ReviewCompleted");
+        }
+    }
+}
