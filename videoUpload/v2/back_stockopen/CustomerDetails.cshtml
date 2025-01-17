@@ -1,0 +1,419 @@
+@using Dcn.SqlClient.ViewModels
+@model StockOpenListViewModels
+@{
+    ViewBag.Title = "證券【客戶檢視】";
+}
+<div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <h2 class="text-center form-control-title">
+            @ViewBag.Title
+        </h2>
+    </div>
+</div>
+<div class="btn-group btn-group-justified" role="group" aria-label="...">
+    @{Html.RenderPartial("_MenuPartial");}
+</div>
+
+<div class="row">
+    <div class="col-md-12 btn-print">
+        @Html.ActionLink("列印", "CustomerDetailsPrint", new { id = Request.RequestContext.RouteData.Values["id"] as String }, new { @class = "btn btn-danger col-md-2", @target = "_blank" })
+    </div>
+    <div class="col-md-12">
+        <!--Start 憑證-->
+        @Html.DisplayFor(model => model.Certification, "_CertificationDetailTemplate")
+        <!--End 憑證-->
+    </div>
+    <div id="DivPrint">
+        <div class="col-md-6">
+            <h3>
+                一、客戶基本資料
+            </h3>
+        </div>
+        <div class="col-md-6 text-left">
+            <h3>
+                帳號：
+            </h3>
+        </div>
+        <div class="col-md-12">
+            <table class="table table-hover table-rwd table-rwd-print">
+                <tr>
+                    <td>
+                        <div class="row">
+                            <div class="col-md-12">
+                                委託人姓名：@Html.DisplayFor(model => model.Name)
+                            </div>
+                            <div class="col-md-12">
+                                性別：@Html.DisplayFor(model => model.GenderName)
+                            </div>
+
+                            <div class="col-md-12">
+                                年齡：@Html.DisplayFor(model => model.Age)
+                            </div>
+                            <div class="col-md-12">
+                                戶籍地址：
+                                @Html.DisplayFor(model => model.ResidentTownCode)
+                                @Html.DisplayFor(model => model.ResidentAddress)
+                            </div>
+                            <div class="col-md-12">
+                                通訊地址：
+                                @Html.DisplayFor(model => model.TownCode)
+                                @Html.DisplayFor(model => model.Address)
+                            </div>
+                            <div class="col-md-12">
+                                身分證統一編號：@String.Format("{0}", Model.Pid)
+                            </div>
+                            <div class="col-md-12">
+                                銀行帳號：@Html.DisplayFor(model => model.BankAccountId)
+                            </div>
+                            <div class="col-md-12">
+                                戶籍電話：@Html.DisplayFor(model => model.ResidentContactPhone)
+                            </div>
+                            <div class="col-md-12">
+                                通訊電話：@Html.DisplayFor(model => model.ContactPhone)
+                            </div>
+                            <div class="col-md-12">
+                                職業：@Html.DisplayFor(model => model.OccupationName)
+                            </div>
+                            <div class="col-md-12">
+                                服務機構名稱：@Html.DisplayFor(model => model.CompanyName)
+                            </div>
+                            <div class="col-md-12">
+                                擔任職務：@Html.DisplayFor(model => model.JobTitleName)
+                            </div>
+                            <div class="col-md-12">
+                                服務機構電話：@Html.DisplayFor(model => model.CompanyTelePhone)
+                            </div>
+                            <div class="col-md-12">
+                                服務機構地址：@Html.DisplayFor(model => model.CompanyAddress)
+                            </div>
+                            <div class="col-md-12">
+                                E-mail信箱：@Html.DisplayFor(model => model.Email)
+                            </div>
+                            <div class="col-md-12">
+                                傳真電話：@Html.DisplayFor(model => model.Fax)
+                            </div>
+                            <div class="col-md-12">
+                                手機號碼：@Html.DisplayFor(model => model.MobilePhone)
+                            </div>
+                            <div class="col-md-12">
+                                緊急聯絡人：@Html.DisplayFor(model => model.EmergencyName)
+                            </div>
+                            <div class="col-md-12">
+                                電話：@Html.DisplayFor(model => model.EmergencyContactPhone)
+                            </div>
+                            <div class="col-md-12">
+                                如何得知線上開戶：@Html.DisplayFor(model => model.InfoSourceCodeName)
+                            </div>
+                            <div class="col-md-12">
+                                聚財網會員帳號：@Html.DisplayFor(model => model.InfoSourceOther)
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-15">
+                        <div class="row">
+                            <div class="col-md-12 text-center p-bottom-15">
+                                記載事項
+                            </div>
+                            <div class="col-md-12 p-bottom-20">
+                                每月買賣對帳單，您要以何種方式取得？
+                            </div>
+
+                            <div class="col-md-12 p-bottom-20">
+                                <div>
+                                    □ 親自領取
+                                </div>
+                                <div>
+                                    □ 寄到本人通訊地址
+                                </div>
+                                <div>
+                                    ■ 電子對帳單
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 p-bottom-20">
+                                (需開立電子交易戶且須有電子郵件信箱者)
+                            </div>
+
+                            <div class="col-md-12 p-bottom-20">
+                                集保存摺：
+                                @Html.RadioButtonList("Postpone", ViewBag.Postpone as IEnumerable<SelectListItem>, new { @class = "form-control-static p-0" })
+                            </div>
+
+                            <div class="col-md-12 p-bottom-20">
+                                身份籍別:
+                                <div>
+                                    □ 美國籍
+                                </div>
+                                <div>
+                                    ■ 非美國籍
+                                </div>
+                            </div>
+
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <table class="table table-hover table-bordered table-rwd img-upload-w-300">
+                <!-- Start 身　份　證 -->
+                <tr>
+                    <th colspan="2" class="bg-warning">
+                        <div class="text-center text-danger">
+                            委託人身分證（確實核對身分證正本）
+                        </div>
+                    </th>
+                </tr>
+                <tr class="tr-only-hide">
+                    <td>
+                        <div class="text-center">
+                            正面
+                        </div>
+                    </td>
+                    <td>
+                        <div class="text-center">
+                            反面
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-center">
+                        <div class="alert alert-danger data-th" role="alert">
+                            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                            身份証：正面
+                        </div>
+                        @if (!String.IsNullOrEmpty(ViewBag.IdentityModel.Identity1_Url))
+                        {
+                            <img id="Identity1_image" onload="this.onload=null;Dcn.Ajax.jquery_get_file_image('@Url.Action("GetImg")', '@Url.Content(ViewBag.IdentityModel.Identity1_Url)', 'Identity1_image')" src="~/Content/Image/Open/Sop/ImageUploadTemplate/PID1.jpg" alt="身份證-正面" class="img-responsive img-thumbnail" />
+                        }
+                        else
+                        {
+                            <img id="Identity1_image" alt="身份證-正面" class="img-responsive img-thumbnail" />
+                        }
+                    </td>
+                    <td class="text-center">
+                        <div class="alert alert-danger data-th" role="alert">
+                            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                            身份証：反面
+                        </div>
+                        @if (!String.IsNullOrEmpty(ViewBag.IdentityModel.Identity2_Url))
+                        {
+                            <img id="Identity2_image" onload="this.onload=null;Dcn.Ajax.jquery_get_file_image('@Url.Action("GetImg")', '@Url.Content(ViewBag.IdentityModel.Identity2_Url)', 'Identity2_image')" src="~/Content/Image/Open/Sop/ImageUploadTemplate/PID1.jpg" alt="身份證-反面" class="img-responsive img-thumbnail" />
+                        }
+                        else
+                        {
+                            <img id="Identity2_image" alt="身份證-反面" class="img-responsive img-thumbnail" />
+                        }
+                    </td>
+                </tr>
+                <!-- End 身　份　證 -->
+                <!-- Start 駕　照 -->
+                @if (!String.IsNullOrEmpty(ViewBag.IdentityModel.DriverLicence1_Url) && !String.IsNullOrEmpty(ViewBag.IdentityModel.DriverLicence2_Url))
+                {
+                    <tr class="tr-only-hide">
+                        <th colspan="2" class="bg-warning">
+                            <div class="text-center text-danger">
+                                委託人駕照
+                            </div>
+                        </th>
+                    </tr>
+                    <tr class="tr-only-hide">
+                        <td class="text-center">
+                            正面
+                        </td>
+                        <td class="text-center">
+                            反面
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">
+                            <div class="alert alert-danger data-th" role="alert">
+                                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                駕　照-正面
+                            </div>
+                            @if (!String.IsNullOrEmpty(ViewBag.IdentityModel.DriverLicence1_Url))
+                            {
+                                <img id="DriverLicence1_image" onload="this.onload=null;Dcn.Ajax.jquery_get_file_image('@Url.Action("GetImg")', '@Url.Content(ViewBag.IdentityModel.DriverLicence1_Url)', 'DriverLicence1_image')" src="~/Content/Image/Open/Sop/ImageUploadTemplate/PID1.jpg" alt="駕　照-正面" class="img-responsive img-thumbnail" />
+                            }
+                            else
+                            {
+                                <img id="DriverLicence1_image" alt="駕　照-正面" class="img-responsive img-thumbnail" />
+                            }
+                        </td>
+                        <td class="text-center">
+                            <div class="alert alert-danger data-th" role="alert">
+                                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                駕　照-反面
+                            </div>
+                            @if (!String.IsNullOrEmpty(ViewBag.IdentityModel.DriverLicence2_Url))
+                            {
+                                <img id="DriverLicence2_image" onload="this.onload=null;Dcn.Ajax.jquery_get_file_image('@Url.Action("GetImg")', '@Url.Content(ViewBag.IdentityModel.DriverLicence2_Url)', 'DriverLicence2_image')" src="~/Content/Image/Open/Sop/ImageUploadTemplate/PID1.jpg" alt="駕　照-反面" class="img-responsive img-thumbnail" />
+                            }
+                            else
+                            {
+                                <img id="DriverLicence2_image" alt="駕　照-反面" class="img-responsive img-thumbnail" />
+                            }
+                        </td>
+                    </tr>
+                }
+                <!-- End 駕　照 -->
+                <!-- Start 健保卡 -->
+                @if (!String.IsNullOrEmpty(ViewBag.IdentityModel.HealthInsurance1_Url))
+                {
+                    <tr class="tr-only-hide">
+                        <th colspan="2" class="text-center text-danger bg-warning">
+                            委託人健保卡
+                        </th>
+                    </tr>
+                    <tr class="tr-only-hide">
+                        <td colspan="2" class="text-center">
+                            正面
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-center" colspan="2">
+                            <div class="alert alert-danger data-th" role="alert">
+                                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                健保卡-反面
+                            </div>
+                            @if (!String.IsNullOrEmpty(ViewBag.IdentityModel.HealthInsurance1_Url))
+                            {
+                                <img id="HealthInsurance1_image" onload="this.onload=null;Dcn.Ajax.jquery_get_file_image('@Url.Action("GetImg")', '@Url.Content(ViewBag.IdentityModel.HealthInsurance1_Url)', 'HealthInsurance1_image')" src="~/Content/Image/Open/Sop/ImageUploadTemplate/PID1.jpg" alt="健保卡-正面" class="img-responsive img-thumbnail" />
+                            }
+                        </td>
+                    </tr>
+                }
+                <!-- End 健保卡 -->
+            </table>
+        </div>
+        <fieldset>
+            <legend class="text-center">檔案上傳</legend>
+            <hr>
+            <div class="form-group">
+                <div class="col-md-12 col-sm-12 col-xs-12 text-center">
+                    <video id="videoClient" autoplay playsinline style="width: 100%; height: auto; max-width: 640px; max-height: 480px; border: 1px solid #000;"></video>
+                    <video id="videoBackend" autoplay playsinline style="width: 100%; height: auto; max-width: 640px; max-height: 480px; border: 1px solid #000;"></video>
+                </div>
+                <div class="col-md-4 col-sm-4 col-xs-6">
+                    <input type="submit" title="開始視訊驗證" value="開始視訊驗證" id="StartClick" name="TempSave" class="btn btn-danger btn-block" />
+                </div>
+                <div class="col-md-offset-2 col-md-4 col-sm-offset-2 col-sm-4 col-xs-6">
+                    <input type="button" value="擷取影像" name="TempSave" id="capture" class="btn btn-info" />
+                </div>
+                <div class="col-md-4 col-sm-4 col-xs-6">
+                    <input type="button" value="完成審查" name="TempSave" id="complete" class="btn btn-info" />
+                </div>
+                <form id="imageForm" method="POST" action="/Review/UploadCapturedImage">
+                    <input id="hiddenImageInput" name="capturedImage" type="hidden" />
+                </form>
+            </div>
+        </fieldset>
+        <div class="col-md-12">
+            以上資料適用於集中市場、櫃檯買賣、有價證券集中保管、信用交易等開戶契約或其他依主管機關規定應行出具之文件，及委託人對　貴公司出具之資料。
+        </div>
+</div>
+</div>
+<hr />
+<div class="row">
+    <div class="col-md-offset-4 col-md-4 col-xs-12">
+        @Html.BootstrapIconActionLink("返回列表", "Index", null, null, "glyphicon glyphicon-record", new { @class = "btn btn-primary btn-block" })
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $('.img-thumbnail').on('click', Dcn.Even.ImgThumbnailClick);
+    </script>
+    <script type="text/javascript">
+        const videoClient = document.getElementById("videoClient");
+        const videoBackend = document.getElementById("videoBackend");
+        const startReviewButton = document.getElementById("StartClick");
+        const captureButton = document.getElementById("capture");
+        const completeButton = document.getElementById("complete");
+        const hiddenImageInput = document.getElementById("hiddenImageInput");
+        const imageForm = document.getElementById("imageForm");
+
+        let backendStream;
+        let connection;
+
+        // 啟動後台視訊
+        async function startBackendVideo() {
+            try {
+                backendStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                videoBackend.srcObject = backendStream;
+
+                // 設定定時捕獲每一幀並轉換為 Base64
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                setInterval(() => {
+                    if (videoBackend.videoWidth > 0 && videoBackend.videoHeight > 0) {
+                        canvas.width = videoBackend.videoWidth;
+                        canvas.height = videoBackend.videoHeight;
+                        ctx.drawImage(videoBackend, 0, 0, canvas.width, canvas.height);
+                        const base64Image = canvas.toDataURL('image/jpeg'); // 轉換為 Base64 編碼的影像
+                        // 將 Base64 編碼的影像發送給前台
+                        connection.invoke("SendBackendVideoFrame", base64Image);
+                    }
+                }, 100); // 每100毫秒捕獲一次影像
+            } catch (err) {
+                console.error("無法啟動後台視訊：", err);
+            }
+        }
+
+        // 初始化 SignalR 連接
+        async function initializeConnection() {
+            connection = new signalR.HubConnectionBuilder()
+                .withUrl("/videoHub")
+                .build();
+
+            // 接收前台視訊流並顯示
+            connection.on("ReceiveClientVideoFrame", (base64Image) => {
+                const img = new Image();
+                img.src = base64Image;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    videoClient.srcObject = canvas.captureStream(); // 顯示客戶端影像
+                };
+            });
+
+            connection.start().catch(err => console.error("SignalR 連接失敗：", err));
+        }
+
+        // 啟動審查
+        startReviewButton.onclick = async () => {
+            startReviewButton.disabled = true; // 禁用開始按鈕
+            captureButton.disabled = false;   // 啟用擷取按鈕
+            completeButton.disabled = false; // 啟用完成按鈕
+
+            await initializeConnection(); // 初始化 SignalR
+            await startBackendVideo();    // 啟動後台視訊
+        };
+
+        // 擷取影像
+        captureButton.onclick = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = videoClient.videoWidth;
+            canvas.height = videoClient.videoHeight;
+            ctx.drawImage(videoClient, 0, 0, canvas.width, canvas.height);
+
+            // 將影像轉為 Base64 並傳遞到 hidden input
+            const base64Image = canvas.toDataURL('image/jpeg'); // 預設格式為 JPEG
+            hiddenImageInput.value = base64Image;
+
+            var post_url = '@Url.Action("UploadIdentityConfirm")';
+            Dcn.Ajax.jquery_upload_file_image(post_url, "#hiddenImageInput");
+        };
+
+        // 完成審查
+        completeButton.onclick = () => {
+            connection.invoke("CompleteReview");
+            alert("審查已完成！");
+            // 可以跳轉或清理頁面
+        };
+    </script>
+}
